@@ -1,0 +1,63 @@
+﻿<UserControl x:Class="RocketPlus.Views.Plot"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RocketPlus.Views"
+             xmlns:oxy="http://oxyplot.org/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="540" d:DesignWidth="720">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+        <oxy:PlotView Grid.Row="0" Model="{Binding CurData}">
+            <oxy:PlotView.DefaultTrackerTemplate>
+                <ControlTemplate>
+                    <oxy:TrackerControl ShowPointer="False" CornerRadius="8" BorderEdgeMode="Unspecified"
+                                        Background="White" BorderThickness="1" BorderBrush="Black" Distance="0" Margin="0" Opacity="0.8">
+                        <oxy:TrackerControl.Content>
+                            <TextBlock Text="{Binding}" Margin="7"/>
+                        </oxy:TrackerControl.Content>
+                    </oxy:TrackerControl>
+                </ControlTemplate>
+            </oxy:PlotView.DefaultTrackerTemplate>
+        </oxy:PlotView>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <RadioButton Content="BMP180" IsChecked="True" Width="150" Command="{Binding CheckGroupCommand}" CommandParameter="0"/>
+            <RadioButton Content="Acc" Width="150" Command="{Binding CheckGroupCommand}" CommandParameter="1"/>
+            <RadioButton Content="AnguSpeed" Width="150" Command="{Binding CheckGroupCommand}" CommandParameter="2"/>
+            <RadioButton Content="Posture" Width="150" Command="{Binding CheckGroupCommand}" CommandParameter="3"/>
+        </StackPanel>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <RadioButton Content="Temperature" Margin="6" IsEnabled="{Binding IsCheckAble[0]}" IsChecked="{Binding CheckList[0], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+                <RadioButton Content="Pressure" Margin="6" IsEnabled="{Binding IsCheckAble[0]}" IsChecked="{Binding CheckList[1], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+                <RadioButton Content="Altitude" Margin="6" IsEnabled="{Binding IsCheckAble[0]}" IsChecked="{Binding CheckList[2], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <CheckBox Content="AccX" Margin="6" IsEnabled="{Binding IsCheckAble[1]}" IsChecked="{Binding CheckList[3], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+                <CheckBox Content="AccY" Margin="6" IsEnabled="{Binding IsCheckAble[1]}" IsChecked="{Binding CheckList[4], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+                <CheckBox Content="AccZ" Margin="6" IsEnabled="{Binding IsCheckAble[1]}" IsChecked="{Binding CheckList[5], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <CheckBox Content="AnguSpeedX" Margin="6" IsEnabled="{Binding IsCheckAble[2]}" IsChecked="{Binding CheckList[6], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+                <CheckBox Content="AnguSpeedY" Margin="6" IsEnabled="{Binding IsCheckAble[2]}" IsChecked="{Binding CheckList[7], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+                <CheckBox Content="AnguSpeedZ" Margin="6" IsEnabled="{Binding IsCheckAble[2]}" IsChecked="{Binding CheckList[8], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <CheckBox Content="Roll" Margin="6" IsEnabled="{Binding IsCheckAble[3]}" IsChecked="{Binding CheckList[9], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+                <CheckBox Content="Pitch" Margin="6" IsEnabled="{Binding IsCheckAble[3]}" IsChecked="{Binding CheckList[10], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+                <CheckBox Content="Yaw" Margin="6" IsEnabled="{Binding IsCheckAble[3]}" IsChecked="{Binding CheckList[11], Mode=TwoWay}" Command="{Binding UpdateCheckCommand}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

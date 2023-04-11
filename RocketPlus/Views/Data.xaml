@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="RocketPlus.Views.Data"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RocketPlus.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="360" d:DesignWidth="720">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Export Data" HorizontalContentAlignment="Center" Margin="10" Width="100" Command="{Binding ExportDataCommand}" Cursor="Hand"/>
+            <Button Content="Clear Data" HorizontalContentAlignment="Center" Margin="10" Width="100" Command="{Binding ClearDataCommand}" Cursor="Hand"/>
+            <Button Content="Read Data" HorizontalContentAlignment="Center" Margin="10" Width="100" Command="{Binding ReadDataCommand}" Cursor="Hand"/>
+        </StackPanel>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Data}" AutoGenerateColumns="False" BorderThickness="0" CanUserAddRows="False" Margin="8" Cursor="">
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Temperature}" Header="Temperature" Width="2*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Pressure}" Header="Pressure" Width="1.4*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Altitude}" Header="Altitude" Width="1.4*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Acc.X}" Header="AccX" Width="*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Acc.Y}" Header="AccY" Width="*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Acc.Z}" Header="AccZ" Width="*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding AnguSpeed.X}" Header="AnguSpeedX" Width="2*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding AnguSpeed.Y}" Header="AnguSpeedY" Width="2*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding AnguSpeed.Z}" Header="AnguSpeedZ" Width="2*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Posture.X}" Header="Roll" Width="*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Posture.Y}" Header="Pitch" Width="*"/>
+                <DataGridTextColumn IsReadOnly="True" Binding="{Binding Posture.Z}" Header="Yaw" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        </Grid>
+</UserControl>

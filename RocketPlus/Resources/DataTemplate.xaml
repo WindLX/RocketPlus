@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:RocketPlus.ViewModels"
+                    xmlns:v="clr-namespace:RocketPlus.Views">
+
+    <DataTemplate DataType="{x:Type vm:MessageViewModel}">
+        <v:Message/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:DataViewModel}">
+        <v:Data/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:StateViewModel}">
+        <v:State/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:MapViewModel}">
+        <v:Map/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PlotViewModel}">
+        <v:Plot/>
+    </DataTemplate>
+
+</ResourceDictionary>
