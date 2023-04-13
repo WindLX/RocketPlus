@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
@@ -10,10 +11,8 @@ using RocketPlus.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Diagnostics;
 using System.IO;
-using CommunityToolkit.Mvvm.Messaging;
+using System.Linq;
 
 namespace RocketPlus.ViewModels
 {
@@ -152,7 +151,7 @@ namespace RocketPlus.ViewModels
             if (File.Exists(path.filePath))
             {
                 data = new();
-                using (StreamReader sr = new StreamReader(path.filePath))
+                using (StreamReader sr = new(path.filePath))
                 {
                     string? line;
                     if (Path.GetExtension(path.filePath) == ".txt")

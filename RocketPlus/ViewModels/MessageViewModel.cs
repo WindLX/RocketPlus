@@ -18,7 +18,7 @@ namespace RocketPlus.ViewModels
 
         public MessageViewModel()
         {
-            Client.Instace.OnRecvMessage += (msg) => RawMessage += $"> {msg.Trim().TrimEnd()}\n";
+            Client.Instace.OnRecvMessage += (msg) => RawMessage += $"> {msg.TrimStart().TrimEnd()}\n";
             Client.Instace.OnConnectStateChange += (state) =>
             {
                 switch (state)

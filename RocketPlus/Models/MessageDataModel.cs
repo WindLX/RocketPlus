@@ -272,14 +272,21 @@ namespace RocketPlus.Models
                     Dictionary<string, string> msgDict = new();
                     foreach (var item in msgList)
                     {
-                        (string key, string value) = (item.Split('=')[0], item.Split('=')[1]);
-                        if (msgDict.ContainsKey(key))
+                        try
                         {
-                            msgDict[key] = value;
+                            (string key, string value) = (item.Split('=')[0], item.Split('=')[1]);
+                            if (msgDict.ContainsKey(key))
+                            {
+                                msgDict[key] = value;
+                            }
+                            else
+                            {
+                                msgDict.Add(key, value);
+                            }
                         }
-                        else
+                        catch (IndexOutOfRangeException)
                         {
-                            msgDict.Add(key, value);
+                            return new Dictionary<string, string>();
                         }
                     }
                     return msgDict;

@@ -44,9 +44,9 @@ namespace RocketPlus.Services
             OnConnectStateChange?.Invoke(RocketConnectState.Connecting);
 
             await Subscribe();
-            
+
             OnRecvMessage?.Invoke("Socket has been opened!\r\n");
-            
+
             if (cts.Token.IsCancellationRequested)
             {
                 cts.TryReset();
@@ -54,7 +54,7 @@ namespace RocketPlus.Services
 
             ping = new(Ping) { IsBackground = true };
             ping.Start();
-            
+
             recv = new(Recv) { IsBackground = true };
             recv.Start();
         }
