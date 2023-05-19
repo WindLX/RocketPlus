@@ -8,6 +8,7 @@ using OxyPlot.Series;
 using RocketPlus.Models;
 using RocketPlus.Services;
 using RocketPlus.Utils;
+using RocketPlus.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -50,7 +51,7 @@ namespace RocketPlus.ViewModels
                 }
             };
 
-            WeakReferenceMessenger.Default.Register<FilePathMessage>(this, ReadData);
+            WeakReferenceMessenger.Default.Register<FileDataMessage>(this, ReadData);
         }
 
         [RelayCommand]
@@ -146,66 +147,15 @@ namespace RocketPlus.ViewModels
                 showList.Add(IsCheckAble[i / 3] && CheckList[i]);
         }
 
-        private void ReadData(object recipient, FilePathMessage path)
+        private void ReadData(object recipient, FileDataMessage message)
         {
-            if (File.Exists(path.filePath))
+            if (message.MessageData != null)
             {
                 data = new();
-                using (StreamReader sr = new(path.filePath))
-                {
-                    string? line;
-                    if (Path.GetExtension(path.filePath) == ".txt")
-                    {
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            Dictionary<string, string> msgDict = line
-                                .Trim()
-                                .TrimEnd()
-                                .Split(',')
-                                .Select(pair => new KeyValuePair<string, string>(pair.Split("=")[0], pair.Split("=")[1]))
-                                .Where((value, index) => index > 0 && index < 13)
-                                .ToDictionary(pair => pair.Key, pair => pair.Value);
-                            data.Add(new MessageDataModel()
-                            {
-                                Temperature = float.Parse(msgDict["Temperature"]),
-                                Altitude = float.Parse(msgDict["Altitude"]),
-                                Pressure = float.Parse(msgDict["Pressure"]),
-                                Acc = new Vector3 { X = float.Parse(msgDict["AccX"]), Y = float.Parse(msgDict["AccY"]), Z = float.Parse(msgDict["AccZ"]) },
-                                AnguSpeed = new Vector3 { X = float.Parse(msgDict["AnguSpeX"]), Y = float.Parse(msgDict["AnguSpeY"]), Z = float.Parse(msgDict["AnguSpeZ"]) },
-                                Posture = new Vector3 { X = float.Parse(msgDict["RollAngle"]), Y = float.Parse(msgDict["PitchAngle"]), Z = float.Parse(msgDict["YawAngle"]) },
-                            });
-                        }
-                    }
-                    else if (Path.GetExtension(path.filePath) == ".csv")
-                    {
-                        var key = sr.ReadLine();
-                        List<string> keys = key
-                            .Trim()
-                            .TrimEnd()
-                            .Split(",")
-                            .ToList();
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            Dictionary<string, string> msgDict = line
-                                .Trim()
-                                .TrimEnd()
-                                .Split(',')
-                                .Select((value, index) => new KeyValuePair<string, string>(keys[index], value))
-                                .ToDictionary(pair => pair.Key, pair => pair.Value);
-                            data.Add(new MessageDataModel()
-                            {
-                                Temperature = float.Parse(msgDict["Temperature"]),
-                                Altitude = float.Parse(msgDict["Altitude"]),
-                                Pressure = float.Parse(msgDict["Pressure"]),
-                                Acc = new Vector3 { X = float.Parse(msgDict["AccX"]), Y = float.Parse(msgDict["AccY"]), Z = float.Parse(msgDict["AccZ"]) },
-                                AnguSpeed = new Vector3 { X = float.Parse(msgDict["AnguSpeedX"]), Y = float.Parse(msgDict["AnguSpeedY"]), Z = float.Parse(msgDict["AnguSpeedZ"]) },
-                                Posture = new Vector3 { X = float.Parse(msgDict["Roll"]), Y = float.Parse(msgDict["Pitch"]), Z = float.Parse(msgDict["Yaw"]) },
-                            });
-                        }
-                    }
-                }
+                message.MessageData.ForEach(s => data.Add(s));
                 UpdateDataAll();
             }
         }
+
     }
 }

@@ -1,6 +1,9 @@
 ﻿using RocketPlus.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace RocketPlus.Models
 {
@@ -203,25 +206,18 @@ namespace RocketPlus.Models
             {
                 try
                 {
-                    Random ra = new();
+                    DateTime dt = DateTime.ParseExact(msgDict["UTC"], "HHmmss.fff", null);
+                    dt = dt.AddHours(8);
+
                     var MapData = new MapDataModel()
                     {
-                        DateTime = DateTime.Now,
+                        DateTime = dt,
                         Position = new Position
                         {
-                            Lat = ra.NextFloat(103.930759F, 103.931687F),
-                            Lon = ra.NextFloat(30.742709F, 30.744032F),
+                            Lat = float.Parse(msgDict["Lat"][1..3]) + float.Parse(msgDict["Lat"][3..]) / 60,
+                            Lon = float.Parse(msgDict["Lon"][1..4]) + float.Parse(msgDict["Lon"][4..]) / 60,
                         }
                     };
-                    //var MapData = new MapDataModel()
-                    //{
-                    //    DateTime = DateTime.Now,
-                    //    Position = new Position
-                    //    {
-                    //        Lat = float.Parse(msgDict["Lat"][..^7]) + float.Parse(msgDict["Lat"][^8..]) / 60,
-                    //        Lon = float.Parse(msgDict["Lon"][..^7]) + float.Parse(msgDict["Lon"][^8..]) / 60,
-                    //    }
-                    //};
                     return MapData;
                 }
                 catch
@@ -306,6 +302,131 @@ namespace RocketPlus.Models
                     res &= false;
             }
             return res;
+        }
+
+        public static List<MessageDataModel>? FileToDataConverter(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                List<MessageDataModel> Data = new();
+                string? line;
+                if (Path.GetExtension(filePath) == ".txt")
+                {
+                    using StreamReader sr = new(filePath);
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        Dictionary<string, string> msgDict = line
+                            .Trim()
+                            .TrimEnd()
+                            .Split(',')
+                            .Select(pair => new KeyValuePair<string, string>(pair.Split("=")[0], pair.Split("=")[1]))
+                            .Where((value, index) => index > 0 && index < 13)
+                            .ToDictionary(pair => pair.Key, pair => pair.Value);
+                        Data.Add(new MessageDataModel()
+                        {
+                            Temperature = float.Parse(msgDict["Temperature"]),
+                            Altitude = float.Parse(msgDict["Altitude"]),
+                            Pressure = float.Parse(msgDict["Pressure"]),
+                            Acc = new Vector3 { X = float.Parse(msgDict["AccX"]), Y = float.Parse(msgDict["AccY"]), Z = float.Parse(msgDict["AccZ"]) },
+                            AnguSpeed = new Vector3 { X = float.Parse(msgDict["AnguSpeX"]), Y = float.Parse(msgDict["AnguSpeY"]), Z = float.Parse(msgDict["AnguSpeZ"]) },
+                            Posture = new Vector3 { X = float.Parse(msgDict["RollAngle"]), Y = float.Parse(msgDict["PitchAngle"]), Z = float.Parse(msgDict["YawAngle"]) },
+                        });
+                    }
+                }
+                else if (Path.GetExtension(filePath) == ".csv")
+                {
+                    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                    Encoding gb2312 = Encoding.GetEncoding("GB2312");
+                    using StreamReader sr = new(filePath, gb2312);
+                    var key = sr.ReadLine();
+                    if (key != null)
+                    {
+                        List<string> keys = new();
+                        if (key.StartsWith("#"))
+                        {
+                            key = key[1..];
+                            keys = key.Trim().TrimEnd().Split(',').Select(s =>
+                            {
+                                return s switch
+                                {
+                                    "高度 (m)" => "Altitude",
+                                    "空气温度 (°C)" => "Temperature",
+                                    "空气压力 (mbar)" => "Pressure",
+                                    "滚转角速度 (°/s)" => "AnguSpeedZ",
+                                    "俯仰角速度 (°/s)" => "AnguSpeedY",
+                                    "偏航角速度 (°/s)" => "AnguSpeedX",
+                                    "垂直加速度 (m/s?)" => "垂直加速度 (m/s?)",
+                                    "横向加速度 (m/s?)" => "横向加速度 (m/s?)",
+                                    "垂直方向 (天顶角) (°)" => "垂直方向 (天顶角) (°)",
+                                    "水平方向 (方位角) (°)" => "水平方向 (方位角) (°)",
+                                    _ => "",
+                                };
+                            }).ToList();
+                        }
+                        else
+                        {
+                            keys = key
+                             .Trim()
+                             .TrimEnd()
+                             .Split(",")
+                             .ToList();
+                        }
+
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            Dictionary<string, string> msgDict = line
+                                .Trim()
+                                .TrimEnd()
+                                .Split(',')
+                                .Select((value, index) => new { Index = index, Value = value })
+                                .Where(pair => keys[pair.Index] != "")
+                                .ToDictionary(pair => keys[pair.Index], pair => pair.Value);
+                            float temperature = float.Parse(msgDict["Temperature"]);
+                            float altitude = float.Parse(msgDict["Altitude"]);
+                            float pressure = float.Parse(msgDict["Pressure"]);
+                            Vector3 anguSpeed = new() { X = float.Parse(msgDict["AnguSpeedX"]), Y = float.Parse(msgDict["AnguSpeedY"]), Z = float.Parse(msgDict["AnguSpeedZ"]) };
+                            Vector3 acc = new();
+                            Vector3 posture = new();
+                            if (msgDict.ContainsKey("AccX"))
+                            {
+                                acc = new() { X = float.Parse(msgDict["AccX"]), Y = float.Parse(msgDict["AccY"]), Z = float.Parse(msgDict["AccZ"]) };
+                                posture = new() { X = float.Parse(msgDict["Roll"]), Y = float.Parse(msgDict["Pitch"]), Z = float.Parse(msgDict["Yaw"]) };
+                            }
+                            else
+                            {
+                                float verticalAcceleration = float.Parse(msgDict["垂直加速度 (m/s?)"]);
+                                float lateralAcceleration = float.Parse(msgDict["横向加速度 (m/s?)"]);
+                                float verticalAngle = float.Parse(msgDict["垂直方向 (天顶角) (°)"]);
+                                float horizontalAngle = float.Parse(msgDict["水平方向 (方位角) (°)"]);
+
+                                // 计算XYZ方向的加速度
+                                double xAcceleration = lateralAcceleration * Math.Cos(horizontalAngle) - verticalAcceleration * Math.Sin(horizontalAngle) * Math.Sin(verticalAngle);
+                                double yAcceleration = -lateralAcceleration * Math.Sin(horizontalAngle) - verticalAcceleration * Math.Cos(horizontalAngle) * Math.Sin(verticalAngle);
+                                double zAcceleration = verticalAcceleration * Math.Cos(verticalAngle);
+
+                                // 计算姿态角
+                                double rollAngle = Math.Atan2(-yAcceleration, zAcceleration) * 180 / Math.PI;
+                                double pitchAngle = Math.Atan2(xAcceleration, Math.Sqrt(yAcceleration * yAcceleration + zAcceleration * zAcceleration)) * 180 / Math.PI;
+                                double yawAngle = Math.Atan2(-lateralAcceleration, Math.Sqrt(verticalAcceleration * verticalAcceleration + lateralAcceleration * lateralAcceleration)) * 180 / Math.PI;
+
+                                acc = new() { X = (float)xAcceleration, Y = (float)yAcceleration, Z = (float)zAcceleration };
+                                posture = new() { X = (float)rollAngle, Y = (float)pitchAngle, Z = (float)yawAngle };
+                            }
+                            Data.Add(new MessageDataModel()
+                            {
+                                Temperature = temperature,
+                                Altitude = altitude,
+                                Pressure = pressure,
+                                Acc = acc,
+                                AnguSpeed = anguSpeed,
+                                Posture = posture,
+                            });
+                        }
+                    }
+                }
+                return Data;
+            }
+            else return null;
         }
     }
 }

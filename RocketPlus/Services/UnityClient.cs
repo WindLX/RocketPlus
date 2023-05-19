@@ -17,9 +17,9 @@ namespace RocketPlus.Services
             await unityClientSocket.ConnectAsync(ipEndPoint);
         }
 
-        public async void Send(string posture)
+        public async void Send(string data)
         {
-            var messageBytes = Encoding.UTF8.GetBytes(posture);
+            var messageBytes = Encoding.UTF8.GetBytes(data);
             while (unityClientSocket == null)
                 await Connect();
             await unityClientSocket.SendAsync(messageBytes, SocketFlags.None);

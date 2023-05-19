@@ -15,6 +15,7 @@
             <Button Content="Export Data" HorizontalContentAlignment="Center" Margin="10" Width="100" Command="{Binding ExportDataCommand}" Cursor="Hand"/>
             <Button Content="Clear Data" HorizontalContentAlignment="Center" Margin="10" Width="100" Command="{Binding ClearDataCommand}" Cursor="Hand"/>
             <Button Content="Read Data" HorizontalContentAlignment="Center" Margin="10" Width="100" Command="{Binding ReadDataCommand}" Cursor="Hand"/>
+            <Button Content="Send Data" HorizontalContentAlignment="Center" Margin="10" Width="100" Command="{Binding SendDataCommand}" Cursor="Hand"/>
         </StackPanel>
         <DataGrid Grid.Row="1" ItemsSource="{Binding Data}" AutoGenerateColumns="False" BorderThickness="0" CanUserAddRows="False" Margin="8" Cursor="">
             <DataGrid.Columns>

@@ -29,7 +29,7 @@
                     <TextBlock Text="{Binding MapData.Position.Lon,StringFormat=Lon: {0}}"/>
                 </Label.Content>
             </Label>
-            <Button Content="Show Model" HorizontalContentAlignment="Center" Margin="10 100 10 10" Width="100" Command="{Binding ShowCommand}" Cursor="Hand" Height="35"/>
+            <Button Content="Connect Model" HorizontalContentAlignment="Center" Margin="10 100 10 10" Width="100" Command="{Binding ShowCommand}" Cursor="Hand" Height="35"/>
         </StackPanel>
         <wv2:WebView2 Source="{Binding MapUri}" Grid.Column="1"/>
     </Grid>

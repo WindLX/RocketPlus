@@ -1,4 +1,7 @@
-﻿namespace RocketPlus.Utils
+﻿using RocketPlus.Models;
+using System.Collections.Generic;
+
+namespace RocketPlus.Utils
 {
     public enum RocketConnectState
     {
@@ -8,5 +11,5 @@
         Disconnect = 3,
     }
 
-    public record FilePathMessage(string filePath);
+    public record FileDataMessage(List<MessageDataModel>? MessageData);
 }

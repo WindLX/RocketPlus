@@ -53,8 +53,8 @@ namespace RocketPlus.ViewModels
         {
             Client.Instace.OnRawMessage += (msg) =>
             {
-                if (MessageDataConverter.RawMessageToPostureConverter(msg) != Vector3.Zero)
-                    UnityClient.Instace.Send(MessageDataConverter.RawMessageToPostureConverter(msg).ToString());
+                if (MessageDataConverter.RawMessageToDataConverter(msg) != MessageDataModel.Zero)
+                    UnityClient.Instace.Send(MessageDataConverter.RawMessageToDataConverter(msg).ToString());
             };
         }
     }

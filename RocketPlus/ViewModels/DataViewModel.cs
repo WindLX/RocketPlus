@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace RocketPlus.ViewModels
 {
@@ -29,7 +30,16 @@ namespace RocketPlus.ViewModels
                     });
             };
 
-            WeakReferenceMessenger.Default.Register<FilePathMessage>(this, ReadData);
+            WeakReferenceMessenger.Default.Register<FileDataMessage>(this, ReadData);
+        }
+
+        private void ReadData(object recipient, FileDataMessage message)
+        {
+            if (message.MessageData != null)
+            {
+                Data = new();
+                message.MessageData.ForEach(s => Data.Add(s));
+            }
         }
 
         [RelayCommand]
@@ -71,67 +81,25 @@ namespace RocketPlus.ViewModels
             if (res == true)
             {
                 var file = dialog.FileName;
-                WeakReferenceMessenger.Default.Send(new FilePathMessage(file));
+                List<MessageDataModel>? data = MessageDataConverter.FileToDataConverter(file);
+                WeakReferenceMessenger.Default.Send(new FileDataMessage(data));
             }
         }
 
-        private void ReadData(object recipient, FilePathMessage path)
+        [RelayCommand]
+        private void SendData()
         {
-            if (File.Exists(path.filePath))
+            Thread sendThread = new(SendDataFunc) { IsBackground = true };
+            sendThread.Start();
+        }
+
+        private void SendDataFunc()
+        {
+            Data.ToList().ForEach(data =>
             {
-                Data = new();
-                using StreamReader sr = new(path.filePath);
-                string? line;
-                if (Path.GetExtension(path.filePath) == ".txt")
-                {
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        Dictionary<string, string> msgDict = line
-                            .Trim()
-                            .TrimEnd()
-                            .Split(',')
-                            .Select(pair => new KeyValuePair<string, string>(pair.Split("=")[0], pair.Split("=")[1]))
-                            .Where((value, index) => index > 0 && index < 13)
-                            .ToDictionary(pair => pair.Key, pair => pair.Value);
-                        Data.Add(new MessageDataModel()
-                        {
-                            Temperature = float.Parse(msgDict["Temperature"]),
-                            Altitude = float.Parse(msgDict["Altitude"]),
-                            Pressure = float.Parse(msgDict["Pressure"]),
-                            Acc = new Vector3 { X = float.Parse(msgDict["AccX"]), Y = float.Parse(msgDict["AccY"]), Z = float.Parse(msgDict["AccZ"]) },
-                            AnguSpeed = new Vector3 { X = float.Parse(msgDict["AnguSpeX"]), Y = float.Parse(msgDict["AnguSpeY"]), Z = float.Parse(msgDict["AnguSpeZ"]) },
-                            Posture = new Vector3 { X = float.Parse(msgDict["RollAngle"]), Y = float.Parse(msgDict["PitchAngle"]), Z = float.Parse(msgDict["YawAngle"]) },
-                        });
-                    }
-                }
-                else if (Path.GetExtension(path.filePath) == ".csv")
-                {
-                    var key = sr.ReadLine();
-                    List<string> keys = key
-                        .Trim()
-                        .TrimEnd()
-                        .Split(",")
-                        .ToList();
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        Dictionary<string, string> msgDict = line
-                            .Trim()
-                            .TrimEnd()
-                            .Split(',')
-                            .Select((value, index) => new KeyValuePair<string, string>(keys[index], value))
-                            .ToDictionary(pair => pair.Key, pair => pair.Value);
-                        Data.Add(new MessageDataModel()
-                        {
-                            Temperature = float.Parse(msgDict["Temperature"]),
-                            Altitude = float.Parse(msgDict["Altitude"]),
-                            Pressure = float.Parse(msgDict["Pressure"]),
-                            Acc = new Vector3 { X = float.Parse(msgDict["AccX"]), Y = float.Parse(msgDict["AccY"]), Z = float.Parse(msgDict["AccZ"]) },
-                            AnguSpeed = new Vector3 { X = float.Parse(msgDict["AnguSpeedX"]), Y = float.Parse(msgDict["AnguSpeedY"]), Z = float.Parse(msgDict["AnguSpeedZ"]) },
-                            Posture = new Vector3 { X = float.Parse(msgDict["Roll"]), Y = float.Parse(msgDict["Pitch"]), Z = float.Parse(msgDict["Yaw"]) },
-                        });
-                    }
-                }
-            }
+                UnityClient.Instace.Send(data.ToString());
+                Thread.Sleep(200);
+            });
         }
     }
 }

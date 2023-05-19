@@ -88,20 +88,6 @@ namespace RocketPlus.Services
             }
         }
 
-        //public async void SendTest()
-        //{
-        //    if (clientSocket != null)
-        //    {
-        //        var message = "cmd=2&uid=97c541e615ab43918f0a1e1a64d400ed&topic=Rocket&msg=UTC=101801.000,Temperature=19.400,Pressure=94987,Altitude=541.309,RollAngle=64.6,PitchAngle=17.9,YawAngle=148.2,AccX=-0.170,AccY=1.001,AccZ=1.708,AnguSpeX=-4.7,AnguSpeY=-0.3,AnguSpeZ=-0.9,Lat=,Lon=\r\n";
-        //        var messageBytes = Encoding.UTF8.GetBytes(message);
-        //        await Task.Run(() =>
-        //        {
-        //            Thread.Sleep(3000);
-        //        });
-        //        await clientSocket.SendAsync(messageBytes, SocketFlags.None);
-        //    }
-        //}
-
         private void Ping()
         {
             if (clientSocket != null && clientSocket.Connected)
