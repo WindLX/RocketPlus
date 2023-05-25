@@ -63,7 +63,8 @@ namespace RocketPlus.Services
         {
             if (clientSocket != null && clientSocket.Connected)
             {
-                var message = "cmd=1&uid=97c541e615ab43918f0a1e1a64d400ed&topic=Rocket\r\n";
+                // 注册消息
+                var message = "cmd=1&uid=xxxxxx&topic=Rocket\r\n";
                 var messageBytes = Encoding.UTF8.GetBytes(message);
                 var n = await clientSocket.SendAsync(messageBytes, SocketFlags.None);
                 if (n == 0)
@@ -77,7 +78,8 @@ namespace RocketPlus.Services
             {
                 try
                 {
-                    var message = "cmd=2&uid=97c541e615ab43918f0a1e1a64d400ed&topic=Rocket&msg=OPEN\n";
+                    // 紧急开伞消息
+                    var message = "cmd=2&uid=xxxxxx&topic=Rocket&msg=OPEN\n";
                     var messageBytes = Encoding.UTF8.GetBytes(message);
                     await clientSocket.SendAsync(messageBytes, SocketFlags.None);
                 }
